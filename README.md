@@ -1,0 +1,1 @@
+# probot-auto-merge-2.0
