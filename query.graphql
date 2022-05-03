@@ -1,0 +1,99 @@
+query PullRequestQuery($owner:String!, $repo:String!, $pullRequestNumber:Int!) {
+  repository(owner: $owner, name: $repo) {
+    pullRequest(number: $pullRequestNumber) {
+      number
+      state
+      mergeable
+      mergeStateStatus
+      potentialMergeCommit {
+        oid
+      }
+      reviews(last: 100) {
+        nodes {
+          authorAssociation
+          author {
+            login
+          }
+          submittedAt
+          state
+        }
+      }
+      labels(last: 100) {
+        nodes {
+          name
+        }
+      }
+      title
+      body
+      authorAssociation
+      baseRef {
+        repository {
+          owner {
+            login
+          }
+          name
+        }
+        target{
+          oid
+        }
+        name
+      }
+      baseRefOid
+      commits(last: 1) {
+        nodes {
+          commit {
+            checkSuites(last: 10) {
+              nodes {
+                app {
+                  databaseId
+                }
+                status
+                conclusion
+                checkRuns(last: 10) {
+                  nodes {
+                    databaseId
+                    name
+                    conclusion
+                    status
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      allCommits: commits(last: 100) {
+        nodes {
+          commit {
+            abbreviatedOid
+            messageHeadline
+          }
+        }
+      }
+      headRef {
+        repository {
+          owner {
+            login
+          }
+          name
+        }
+        target{
+          oid
+        }
+        name
+      }
+      headRefOid
+      headRefName
+      repository {
+        branchProtectionRules(last: 100) {
+          nodes {
+            pattern
+            restrictsPushes
+            requiresStrictStatusChecks
+            requiredStatusCheckContexts
+          }
+        }
+      }
+    }
+  }
+}

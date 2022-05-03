@@ -1,0 +1,73 @@
+import doesNotHaveMaximumChangesRequested from '../../src/conditions/maximumChangesRequested'
+import { createConditionConfig, createPullRequestInfo, approvedReview, changesRequestedReview } from '../mock'
+import { CommentAuthorAssociation } from '../../src/models'
+
+describe('maximumChangesRequested', () => {
+  it('returns success when owner approved and nothing was configured', async () => {
+    const result = doesNotHaveMaximumChangesRequested(
+      createConditionConfig(),
+      createPullRequestInfo({
+        reviews: {
+          nodes: [
+            approvedReview({ author: { login: 'henk' }, authorAssociation: CommentAuthorAssociation.OWNER })
+          ]
+        }
+      })
+    )
+    expect(result.status).toBe('success')
+  })
+
+  it('returns fail when owner requested changes and none role has 0 maximum requested changes', async () => {
+    const result = doesNotHaveMaximumChangesRequested(
+      createConditionConfig({
+        maxRequestedChanges: {
+          NONE: 0
+        }
+      }),
+      createPullRequestInfo({
+        reviews: {
+          nodes: [
+            changesRequestedReview({ author: { login: 'henk' }, authorAssociation: CommentAuthorAssociation.OWNER })
+          ]
+        }
+      })
+    )
+    expect(result.status).toBe('fail')
+  })
+
+  it('returns fail when owner requested changes and owner role has 0 maximum requested changes', async () => {
+    const result = doesNotHaveMaximumChangesRequested(
+      createConditionConfig({
+        maxRequestedChanges: {
+          OWNER: 0
+        }
+      }),
+      createPullRequestInfo({
+        reviews: {
+          nodes: [
+            changesRequestedReview({ author: { login: 'henk' }, authorAssociation: CommentAuthorAssociation.OWNER })
+          ]
+        }
+      })
+    )
+    expect(result.status).toBe('fail')
+  })
+
+  it('returns success when member requested changes but owner role has 0 maximum requested changes', async () => {
+    const result = doesNotHaveMaximumChangesRequested(
+      createConditionConfig({
+        maxRequestedChanges: {
+          OWNER: 0
+        }
+      }),
+      createPullRequestInfo({
+        reviews: {
+          nodes: [
+            changesRequestedReview({ author: { login: 'henk' }, authorAssociation: CommentAuthorAssociation.MEMBER })
+          ]
+        }
+      })
+    )
+    expect(result.status).toBe('success')
+  })
+})

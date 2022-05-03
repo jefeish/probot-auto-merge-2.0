@@ -1,0 +1,100 @@
+{
+  "name": "probot-auto-merge",
+  "version": "0.0.0-development",
+  "description": "A Probot app that automatically merges PRs",
+  "author": "Bob van der Linden <bobvanderlinden@gmail.com> (https://github.com/bobvanderlinden)",
+  "license": "ISC",
+  "repository": "https://github.com/bobvanderlinden/probot-auto-merge.git",
+  "homepage": "https://github.com/bobvanderlinden/probot-auto-merge",
+  "bugs": "https://github.com/bobvanderlinden/probot-auto-merge/issues",
+  "keywords": [
+    "probot",
+    "github",
+    "probot-app"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "build:watch": "tsc -p tsconfig.json --watch",
+    "debug": "node --inspect-brk=9229 ./lib/index.js --exec \"npm start\"",
+    "dev": "nodemon --exec \"npm start\"",
+    "docker:build": "docker build -t probot-auto-merge .",
+    "docker:run": "docker run -p 0.0.0.0:3000:3000 probot-auto-merge",
+    "docker": "npm run docker:build && npm run docker:run",
+    "start": "probot run ./lib/index.js",
+    "lint": "eslint src/**/*.ts test/**/*.ts",
+    "lint:fix": "npm run lint -- --fix",
+    "test": "jest && npm run lint",
+    "test:travis": "npm run test:ci",
+    "test:ci": "jest --coverage && codecov && npm run lint",
+    "test:watch": "jest --watch --notify --notifyMode=change --coverage",
+    "heroku-postbuild": "npm run build",
+    "schema:download": "apollo service:download --endpoint https://api.github.com/graphql --header \"Authorization: bearer $GITHUB_TOKEN\" --header \"Accept: application/vnd.github.antiope-preview, application/vnd.github.merge-info-preview+json\"",
+    "schema:codegen": "apollo client:codegen --target typescript --config=apollo.config.js --outputFlat src/query.graphql.ts",
+    "schema:update": "npm run schema:download && npm run schema:codegen",
+    "semantic-release": "semantic-release"
+  },
+  "dependencies": {
+    "@mojotech/json-type-validation": "^3.1.0",
+    "bunyan-sentry-stream": "^1.2.1",
+    "debug": "^4.1.1",
+    "dotenv": "^8.1.0",
+    "minimatch": "^3.0.4",
+    "probot": "^9.3.1",
+    "probot-config": "^1.0.1",
+    "raven": "^2.6.4"
+  },
+  "devDependencies": {
+    "@types/debug": "^4.1.1",
+    "@types/jest": "^25.1.0",
+    "@types/minimatch": "^3.0.3",
+    "@types/node": "^13.1.0",
+    "@types/p-queue": "^3.0.0",
+    "@types/raven": "^2.5.3",
+    "@typescript-eslint/eslint-plugin": "^2.6.0",
+    "@typescript-eslint/parser": "^2.6.0",
+    "apollo": "^2.5.1",
+    "codecov": "^3.2.0",
+    "coveralls": "^3.0.2",
+    "eslint": "^6.6.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jest": "^23.0.2",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "jest": "^25.1.0",
+    "nodemon": "^2.0.0",
+    "semantic-release": "^17.0.1",
+    "smee-client": "^1.0.2",
+    "ts-jest": "^25.0.0",
+    "typescript": "^3.3.3"
+  },
+  "engines": {
+    "node": "10.16.3",
+    "npm": "6.4.1"
+  },
+  "standard": {
+    "env": [
+      "jest"
+    ]
+  },
+  "jest": {
+    "setupFiles": [
+      "./test/jest-setup.ts"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "\\.test\\.tsx?$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "testEnvironment": "node",
+    "coverageDirectory": "./coverage/"
+  }
+}
